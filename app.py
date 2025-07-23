@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, send_from_directory
+import json  # این خط رو اضافه کن
 
 app = Flask(__name__)
 
@@ -16,7 +17,7 @@ def slab_details():
         return "No data provided", 400
     
     try:
-        data = json.loads(data_param)
+        data = json.loads(data_param)  # اینجا از json استفاده می‌کنه
         slab_no = data.get('slab_no', 'N/A')
         width = data.get('width', 'N/A')
         length = data.get('length', 'N/A')
@@ -28,7 +29,7 @@ def slab_details():
         warehouse = data.get('warehouse', 'N/A')
         block_image = data.get('block_image', '')
         if block_image and not block_image.startswith('http'):
-            block_image = f"/images/{block_image}"  # مسیر نسبی برای عکس‌ها
+            block_image = f"/images/{block_image}"
         
         return render_template('slab_detail.html', 
                               slab_no=slab_no,
@@ -41,7 +42,7 @@ def slab_details():
                               description=description,
                               warehouse=warehouse,
                               block_image=block_image)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError:  # اینجا هم از json استفاده می‌کنه
         return "Invalid data format", 400
     except Exception as e:
         return f"Error: {str(e)}", 500
