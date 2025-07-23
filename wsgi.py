@@ -1,4 +1,2 @@
 from app import app
-
-if __name__ == "__main__":
-    app.run()
+# حذف خط app.run()، چون gunicorn مدیریت می‌کنه

@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request
-import json
+from flask import Flask, render_template, request, send_from_directory
 
 app = Flask(__name__)
+
+UPLOAD_FOLDER = 'images'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def welcome():
@@ -9,13 +11,11 @@ def welcome():
 
 @app.route('/slab')
 def slab_details():
-    # Get data from QR code URL parameter
     data_param = request.args.get('data')
     if not data_param:
         return "No data provided", 400
     
     try:
-        # Parse JSON data from QR code
         data = json.loads(data_param)
         slab_no = data.get('slab_no', 'N/A')
         width = data.get('width', 'N/A')
@@ -27,6 +27,8 @@ def slab_details():
         description = data.get('description', 'N/A')
         warehouse = data.get('warehouse', 'N/A')
         block_image = data.get('block_image', '')
+        if block_image and not block_image.startswith('http'):
+            block_image = f"/images/{block_image}"  # مسیر نسبی برای عکس‌ها
         
         return render_template('slab_detail.html', 
                               slab_no=slab_no,
@@ -43,6 +45,10 @@ def slab_details():
         return "Invalid data format", 400
     except Exception as e:
         return f"Error: {str(e)}", 500
+
+@app.route('/images/<filename>')
+def serve_image(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
