@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [tool.poetry]
 name = "my-slab-server"
 version = "0.1.0"
@@ -13,4 +14,21 @@ flask = "^3.0.0"
 
 [build-system]
 requires = ["poetry-core"]
+=======
+[tool.poetry]
+name = "my-slab-server"
+version = "0.1.0"
+description = "Slab server application"
+authors = ["Your Name <your.email@example.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.13"
+flask = "^3.0.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core"]
+>>>>>>> c79c727156239fbb7a8e93bd7e12228b5732c2f5
 build-backend = "poetry.core.masonry.api"

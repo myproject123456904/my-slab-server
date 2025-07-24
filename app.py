@@ -17,7 +17,7 @@ def upload_file():
     if file:
         filename = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filename)
-        file_url = f"https://my-slab-server.onrender.com/images/{file.filename}"
+        file_url = f"http://localhost:5000/images/{file.filename}"  # برای تست لوکال
         return jsonify({"url": file_url}), 200
     return jsonify({"error": "Upload failed"}), 500
 
