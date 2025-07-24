@@ -5,46 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slab Information - {{ slab_no }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .detail-item {
-            margin: 10px 0;
-            padding: 10px;
-            background: #e9ecef;
-            border-radius: 4px;
-        }
-        .detail-item span {
-            font-weight: bold;
-            color: #007bff;
-        }
-        .image-link {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .image-link:hover {
-            text-decoration: underline;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h1 { text-align: center; color: #333; }
+        .slab-image { text-align: center; margin-bottom: 20px; }
+        .slab-image img { max-width: 100%; height: auto; }
+        .detail-item { margin: 10px 0; padding: 10px; background: #e9ecef; border-radius: 4px; }
+        .detail-item span { font-weight: bold; color: #007bff; }
+        .view-link { color: #007bff; text-decoration: none; }
+        .view-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Slab Information - {{ slab_no }}</h1>
         <hr>
+        {% if slab_image %}
+        <div class="slab-image">
+            <img src="{{ slab_image }}" alt="Slab Image">
+        </div>
+        {% endif %}
         <div class="detail-item"><span>Slab No:</span> {{ slab_no }}</div>
         <div class="detail-item"><span>Width:</span> {{ width }} cm</div>
         <div class="detail-item"><span>Length:</span> {{ length }} cm</div>
@@ -54,7 +34,9 @@
         <div class="detail-item"><span>Product Code:</span> {{ product_code }}</div>
         <div class="detail-item"><span>Description:</span> {{ description }}</div>
         <div class="detail-item"><span>Warehouse:</span> {{ warehouse }}</div>
-        <div class="detail-item"><span>Block Image:</span> <a href="{{ block_image }}" class="image-link" target="_blank">View</a></div>
+        {% if block_image %}
+        <div class="detail-item"><span>Coup Image:</span> <a href="{{ block_image }}" class="view-link" target="_blank">View</a></div>
+        {% endif %}
     </div>
 </body>
 </html>
