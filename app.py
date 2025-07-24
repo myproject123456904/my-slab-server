@@ -1,61 +1,51 @@
-from flask import Flask, render_template, request, send_from_directory
-import json
+from flask import Flask, request, jsonify
 import os
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = 'images'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
-@app.route('/')
-def welcome():
-    return "Welcome to Slab Info Server! Use /slab endpoint with data parameter."
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file:
+        filename = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(filename)
+        file_url = f"https://my-slab-server.onrender.com/images/{file.filename}"
+        return jsonify({"url": file_url}), 200
+    return jsonify({"error": "Upload failed"}), 500
 
-@app.route('/slab')
-def slab_details():
-    data_param = request.args.get('data')
-    if not data_param:
+@app.route('/slab', methods=['GET'])
+def show_slab():
+    data = request.args.get('data')
+    if not data:
         return "No data provided", 400
-
     try:
-        data = json.loads(data_param)
-        slab_no = data.get('slab_no', 'N/A')
-        width = data.get('width', 'N/A')
-        length = data.get('length', 'N/A')
-        thickness = data.get('thickness', 'N/A')
-        stone = data.get('stone', 'N/A')
-        processing = data.get('processing', 'N/A')
-        product_code = data.get('product_code', 'N/A')
-        description = data.get('description', 'N/A')
-        warehouse = data.get('warehouse', 'N/A')
-        slab_image = data.get('slab_image', '')  # عکس اسلب
-        if slab_image and not slab_image.startswith('http'):
-            slab_image = f"/images/{os.path.basename(slab_image)}"  # فقط اسم فایل
-        block_image = data.get('block_image', '')  # عکس کوپ
-        if block_image and not block_image.startswith('http'):
-            block_image = f"/images/{os.path.basename(block_image)}"  # فقط اسم فایل
-        print(f"slab_image: {slab_image}, block_image: {block_image}")  # برای دیباگ
-
-        return render_template('slab_detail.html', 
-                              slab_no=slab_no,
-                              width=width,
-                              length=length,
-                              thickness=thickness,
-                              stone=stone,
-                              processing=processing,
-                              product_code=product_code,
-                              description=description,
-                              warehouse=warehouse,
-                              slab_image=slab_image,
-                              block_image=block_image)
-    except json.JSONDecodeError:
-        return "Invalid data format", 400
+        data_dict = eval(data)
+        slab_image = data_dict.get('slab_image', 'images/1.jpg')
+        block_image = data_dict.get('block_image', 'images/2.jpg')
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head><meta charset="UTF-8"><title>Slab Details</title></head>
+        <body>
+            <h1>Slab No: {data_dict.get('slab_no', 'N/A')}</h1>
+            <img src="{slab_image}" alt="Slab Image" style="max-width: 300px;">
+            <br><img src="{block_image}" alt="Block Image" style="max-width: 300px;">
+            <p>Width: {data_dict.get('width', '-')}, Length: {data_dict.get('length', '-')}, Thickness: {data_dict.get('thickness', '-')}</p>
+            <p>Stone: {data_dict.get('stone', '-')}, Processing: {data_dict.get('processing', '-')}, Product Code: {data_dict.get('product_code', '-')}</p>
+        </body>
+        </html>
+        """
+        return html, 200
     except Exception as e:
         return f"Error: {str(e)}", 500
 
-@app.route('/images/<filename>')
-def serve_image(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
