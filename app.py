@@ -15,10 +15,15 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     if file:
-        filename = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(filename)
-        file_url = f"https://my-slab-server.onrender.com/images/{file.filename}"
-        return jsonify({"url": file_url}), 200
+        try:
+            filename = os.path.join(UPLOAD_FOLDER, file.filename)
+            file.save(filename)
+            file_url = f"https://my-slab-server.onrender.com/images/{file.filename}"
+            print(f"File saved successfully: {file_url}")  # For debugging
+            return jsonify({"url": file_url}), 200
+        except Exception as e:
+            print(f"Error saving file: {str(e)}")  # For debugging
+            return jsonify({"error": f"Upload failed: {str(e)}"}), 500
     return jsonify({"error": "Upload failed"}), 500
 
 @app.route('/slab', methods=['GET'])
@@ -52,5 +57,5 @@ def home():
     return "Server is running! Use /upload for file uploads or /slab for slab details.", 200
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5000))  # Use Render's PORT or default to 5000
     app.run(host='0.0.0.0', port=port)
