@@ -47,6 +47,10 @@ def show_slab():
     except Exception as e:
         return f"Error: {str(e)}", 500
 
+@app.route('/')
+def home():
+    return "Server is running! Use /upload for file uploads or /slab for slab details.", 200
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
