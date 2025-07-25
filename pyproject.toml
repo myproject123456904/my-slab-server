@@ -2,7 +2,7 @@
 name = "my-slab-server"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Mehdi <mehdi@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.13"
@@ -11,3 +11,6 @@ pillow = "^10.4.0"
 
 [tool.poetry.group.dev.dependencies]
 # Add dev dependencies if any
+
+[tool.poetry]
+package-mode = false
