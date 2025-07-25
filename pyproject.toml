@@ -3,6 +3,7 @@ name = "my-slab-server"
 version = "0.1.0"
 description = ""
 authors = ["Mehdi <mehdi@example.com>"]
+package-mode = false  # این خط رو زیر [tool.poetry] بذار
 
 [tool.poetry.dependencies]
 python = "^3.13"
@@ -11,6 +12,3 @@ pillow = "^10.4.0"
 
 [tool.poetry.group.dev.dependencies]
 # Add dev dependencies if any
-
-[tool.poetry]
-package-mode = false
