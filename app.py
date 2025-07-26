@@ -1,9 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import os
+import json
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'images'
+UPLOAD_FOLDER = '/tmp/images' if os.path.exists('/tmp') else 'images'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
@@ -18,7 +19,7 @@ def upload_file():
         try:
             filename = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(filename)
-            file_url = f"https://my-slab-server.onrender.com/images/{file.filename}"
+            file_url = f"http://localhost:5000/images/{file.filename}" if 'localhost' in request.host else f"https://my-slab-server.onrender.com/images/{file.filename}"
             print(f"File saved successfully: {file_url}")
             return jsonify({"url": file_url}), 200
         except Exception as e:
@@ -26,19 +27,23 @@ def upload_file():
             return jsonify({"error": f"Upload failed: {str(e)}"}), 500
     return jsonify({"error": "Upload failed"}), 500
 
+@app.route('/images/<filename>')
+def serve_image(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
 @app.route('/slab', methods=['GET'])
 def show_slab():
     data = request.args.get('data')
     if not data:
         return "No data provided", 400
     try:
-        data_dict = eval(data)
+        data_dict = json.loads(data)
         slab_image = data_dict.get('slab_image', 'images/1.jpg')
         block_image = data_dict.get('block_image', 'images/2.jpg')
         html = f"""
         <!DOCTYPE html>
         <html lang="en">
-        <head><meta charset="UTF-8"><title>Slab Details</title></head>
+        <head><meta charset="UTF-8"><title>Slab Details - {data_dict.get('slab_no', 'N/A')}</title></head>
         <body>
             <h1>Slab No: {data_dict.get('slab_no', 'N/A')}</h1>
             <img src="{slab_image}" alt="Slab Image" style="max-width: 300px;">
@@ -49,6 +54,8 @@ def show_slab():
         </html>
         """
         return html, 200
+    except json.JSONDecodeError as e:
+        return f"Invalid JSON data: {str(e)}", 400
     except Exception as e:
         return f"Error: {str(e)}", 500
 
